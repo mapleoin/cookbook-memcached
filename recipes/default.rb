@@ -28,7 +28,7 @@ end
 
 package "libmemcache-dev" do
   case node['platform_family']
-  when "rhel", "fedora"
+  when "rhel", "fedora", "suse"
     package_name "libmemcached-devel"
   when "smartos"
     package_name "libmemcached"
@@ -44,7 +44,7 @@ service "memcached" do
 end
 
 case node['platform_family']
-when "rhel", "fedora"
+when "rhel", "fedora", "suse"
   template "/etc/sysconfig/memcached" do
     source "memcached.sysconfig.erb"
     owner "root"
