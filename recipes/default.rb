@@ -28,10 +28,16 @@ end
 
 package "libmemcache-dev" do
   case node['platform_family']
-  when "rhel", "fedora", "suse"
+  when "rhel", "fedora"
     package_name "libmemcached-devel"
   when "smartos"
     package_name "libmemcached"
+  when "suse"
+    if node['platform_version'].to_f < 12
+      package_name "libmemcache-devel"
+    else
+      package_name "libmemcached-devel"
+    end
   else
     package_name "libmemcache-dev"
   end
@@ -45,14 +51,16 @@ end
 
 case node['platform_family']
 when "rhel", "fedora", "suse"
+  family = node['platform_family'] == 'suse' ? 'suse' : 'redhat'
   template "/etc/sysconfig/memcached" do
-    source "memcached.sysconfig.erb"
+    source "memcached.sysconfig.#{family}.erb"
     owner "root"
     group "root"
     mode 00644
     variables(
       :listen => node['memcached']['listen'],
       :user => node['memcached']['user'],
+      :group => node['memcached']['group'],
       :port => node['memcached']['port'],
       :maxconn => node['memcached']['maxconn'],
       :memory => node['memcached']['memory']
